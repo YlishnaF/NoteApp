@@ -23,10 +23,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-
 public class NotesListFragment extends Fragment {
     public static final String CURRENT_NOTE = "Note";
     private Note note = null;
+    MyBottomSheetDialogFragment dialogFragment =
+            MyBottomSheetDialogFragment.newInstance();
+    int n;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -45,7 +48,7 @@ public class NotesListFragment extends Fragment {
 
     public void initList(View view) {
         LinearLayout linearLayout = (LinearLayout) view;
-        List<String> noteTitles=Note.getNotes().stream().map(Note::getName).collect(Collectors.toList());
+        List<String> noteTitles = Note.getNotes().stream().map(Note::getName).collect(Collectors.toList());
 
         for (int i = 0; i < noteTitles.size(); i++) {
             final String title = noteTitles.get(i);
@@ -56,7 +59,7 @@ public class NotesListFragment extends Fragment {
             final int position = i;
             textView.setOnClickListener(v -> {
                 Toast.makeText(getContext(), title, Toast.LENGTH_SHORT).show();
-                note=Note.getNotes().get(position);
+                note = Note.getNotes().get(position);
                 showNoteDescription(note);
             });
         }
@@ -86,7 +89,7 @@ public class NotesListFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId()==R.id.add_note){
+        if (item.getItemId() == R.id.add_note) {
             Note note = new Note("new", "");
             Note.addNote(note);
             FragmentTransaction fragmentTransaction = requireActivity()
@@ -99,11 +102,12 @@ public class NotesListFragment extends Fragment {
         }
         return super.onOptionsItemSelected(item);
     }
-    private void initPopupMenu(View view){
+
+    private void initPopupMenu(View view) {
         Activity activity = requireActivity();
         LinearLayout linearLayout = view.findViewById(R.id.root_layout);
         for (int i = 0; i < linearLayout.getChildCount(); i++) {
-            TextView tv= (TextView) linearLayout.getChildAt(i);
+            TextView tv = (TextView) linearLayout.getChildAt(i);
             int finalI = i;
             tv.setOnLongClickListener(v -> {
                 PopupMenu menu = new PopupMenu(activity, v);
@@ -111,15 +115,12 @@ public class NotesListFragment extends Fragment {
                 menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
-                        switch (menuItem.getItemId()){
+                        switch (menuItem.getItemId()) {
                             case R.id.delete_note:
-                                Note.deleteNotes(finalI);
-                                FragmentTransaction fragmentTransaction = requireActivity()
-                                        .getSupportFragmentManager()
-                                        .beginTransaction();
-                                fragmentTransaction
-                                        .replace(R.id.fragment_container, new NotesListFragment())
-                                        .commit();
+                                dialogFragment.setOnDialogListener(dialogListener);
+                                dialogFragment.show(getChildFragmentManager(),
+                                        "dialog_fragment");
+                                n = finalI;
                                 return true;
                         }
                         return true;
@@ -131,4 +132,26 @@ public class NotesListFragment extends Fragment {
 
         }
     }
+
+    private OnDialogListener dialogListener = new OnDialogListener() {
+        @Override
+        public void onDialogYes() {
+            Note.deleteNotes(n);
+            FragmentTransaction fragmentTransaction = requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction();
+            fragmentTransaction
+                    .replace(R.id.fragment_container, new NotesListFragment())
+                    .commit();
+
+        }
+
+        @Override
+        public void onDialogNo() {
+            Toast.makeText(requireActivity(), "Запись остается", Toast.LENGTH_SHORT).show();
+
+        }
+    };
+
 }
+
