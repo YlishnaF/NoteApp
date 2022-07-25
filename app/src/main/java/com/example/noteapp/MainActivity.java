@@ -6,15 +6,20 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentTransaction;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,15 +45,11 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_about:
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .addToBackStack("")
-                        .add(R.id.fragment_container, new AboutFragment())
-                        .commit();
+                openAboutFragment();
                 return true;
 
             case R.id.exit:
-                finish();
+                showAlertDialog();
                 return true;
         }
 
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
                         drawer.close();
                         return true;
                     case R.id.drawer_exit:
-                        finish();
+                        showAlertDialog();
                         return true;
                 }
                 return false;
@@ -90,4 +91,24 @@ public class MainActivity extends AppCompatActivity {
                 .add(R.id.fragment_container, new AboutFragment()).commit();
     }
 
+    private void showAlertDialog(){
+        new AlertDialog.Builder(this)
+                .setTitle("Выйти из приложения?")
+                .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        finish();
+                    }
+                })
+                .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast.makeText(MainActivity.this, "Остаемся в приложении", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .show();
+    }
+
+
 }
+
