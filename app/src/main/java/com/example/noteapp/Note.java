@@ -69,6 +69,10 @@ public class Note implements Parcelable {
     public static List<Note> getNotes() {
         return notes;
     }
+    public static List<Note> deleteNotes(int i ) {
+        notes.remove(i);
+        return notes;
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -83,6 +87,10 @@ public class Note implements Parcelable {
     }
     private void setId(int id) {
         this.id = id;
+    }
+
+    public static void addNote(Note note){
+        notes.add(note);
     }
 
 }

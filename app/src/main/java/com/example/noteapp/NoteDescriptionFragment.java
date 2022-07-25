@@ -77,6 +77,4 @@ public class NoteDescriptionFragment extends Fragment {
         fragment.setArguments(args);
         return  fragment;
     }
-
-
 }
