@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -47,7 +48,7 @@ public class NotesListFragment extends Fragment {
     }
 
     public void initList(View view) {
-        LinearLayout linearLayout = (LinearLayout) view;
+        FrameLayout linearLayout = (FrameLayout) view;
         List<String> noteTitles = Note.getNotes().stream().map(Note::getName).collect(Collectors.toList());
 
         for (int i = 0; i < noteTitles.size(); i++) {
@@ -105,7 +106,7 @@ public class NotesListFragment extends Fragment {
 
     private void initPopupMenu(View view) {
         Activity activity = requireActivity();
-        LinearLayout linearLayout = view.findViewById(R.id.root_layout);
+        FrameLayout linearLayout = view.findViewById(R.id.root_layout);
         for (int i = 0; i < linearLayout.getChildCount(); i++) {
             TextView tv = (TextView) linearLayout.getChildAt(i);
             int finalI = i;
