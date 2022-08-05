@@ -12,5 +12,8 @@
     <string name="menu">Меню</string>
     <string name="header">Header</string>
     <string name="delete_note">Удалить запись</string>
+    <string name="warning_delete">Удалить запись?</string>
+    <string name="yes">yes</string>
+    <string name="no">No</string>
 
 </resources>
