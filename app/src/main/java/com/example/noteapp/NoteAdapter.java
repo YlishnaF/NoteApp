@@ -7,19 +7,24 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
     private final static String TAG = "NoteAdapter";
 //    List<String> noteTitles;
     private CardSource dataSource;
+    private final Fragment fragment;
     private OnItemClickListener itemClickListener;
+    private int menuPosition;
 
-    public NoteAdapter(CardSource dataSource) {
+    public int getMenuPosition(){
+        return menuPosition;
+    }
+
+    public NoteAdapter(CardSource dataSource, Fragment fragment) {
         this.dataSource=dataSource;
+        this.fragment=fragment;
     }
 
     @NonNull
@@ -58,14 +63,34 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
             super(itemView);
             title = itemView.findViewById(R.id.title);
             description = itemView.findViewById(R.id.description);
-            title.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(itemClickListener!=null){
-                        itemClickListener.onItemClick(view, getAdapterPosition());
-                    }
+            registerContextMenu(itemView);
+            title.setOnClickListener(view -> {
+                if(itemClickListener!=null){
+                    itemClickListener.onItemClick(view, getAdapterPosition());
                 }
             });
+
+            title.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    menuPosition = getLayoutPosition();
+                    itemView.showContextMenu(10,10);
+                    return true;
+                }
+            });
+        }
+
+        private void registerContextMenu(View itemView){
+            if(fragment!=null){
+                itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        menuPosition = getLayoutPosition();
+                        return false;
+                    }
+                });
+                fragment.registerForContextMenu(itemView);
+            }
         }
 
 
