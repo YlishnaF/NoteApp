@@ -1,19 +1,17 @@
 package com.example.noteapp;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CardSourceImpl implements CardSource{
+public class CardSourceImpl implements CardSource {
     private List<CardData> dataSource;
 
     public CardSourceImpl() {
         dataSource = new ArrayList<>();
     }
 
-    public CardSourceImpl init(){
+    public CardSourceImpl init() {
         List<String> noteTitles = Note.getNotes().stream().map(Note::getName).collect(Collectors.toList());
         List<String> noteSDescriptions = Note.getNotes().stream().map(Note::getDescription).collect(Collectors.toList());
         for (int i = 0; i < noteTitles.size(); i++) {
@@ -30,5 +28,26 @@ public class CardSourceImpl implements CardSource{
     @Override
     public int size() {
         return dataSource.size();
+    }
+
+    @Override
+    public void deleteCardData(int position) {
+        dataSource.remove(position);
+    }
+
+    @Override
+    public void updateCardData(int position, CardData cardData) {
+        dataSource.set(position, cardData);
+    }
+
+    @Override
+    public void addCardData(CardData cardData) {
+        dataSource.add(cardData);
+
+    }
+
+    @Override
+    public void clearCardData() {
+        dataSource.clear();
     }
 }

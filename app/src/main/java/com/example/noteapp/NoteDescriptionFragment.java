@@ -11,15 +11,12 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TextView;
-
-import static com.example.noteapp.NotesListFragment.CURRENT_NOTE;
 
 
 public class NoteDescriptionFragment extends Fragment {
     static final String ARG_INDEX = "index";
+    public static final String CURRENT_NOTE = "Note";
     EditText tv;
     EditText nameTv;
     Note note;
@@ -36,11 +33,13 @@ public class NoteDescriptionFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Bundle arg = getArguments();
         if(arg!=null){
+//            note = (Note) arg.getParcelable(CURRENT_NOTE);
             note = (Note) arg.getParcelable(CURRENT_NOTE);
             tv = view.findViewById(R.id.note_description);
             tv.setText(note.getDescription());
             nameTv = view.findViewById(R.id.title);
             nameTv.setText(note.getName());
+//            nameTv.setText(note.getName());
             nameTv.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }

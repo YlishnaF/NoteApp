@@ -1,6 +1,7 @@
 package com.example.noteapp;
 
-public class CardData {
+
+public class CardData  {
     private String title;
     private String description;
 
@@ -16,4 +17,13 @@ public class CardData {
     public String getDescription() {
         return description;
     }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
 }
