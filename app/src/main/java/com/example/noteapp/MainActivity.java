@@ -6,6 +6,8 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.app.AlertDialog;
@@ -26,10 +28,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.fragment_container, new NotesListFragment())
-                .commit();
+//        getSupportFragmentManager()
+//                .beginTransaction()
+//                .add(R.id.fragment_container, new NotesListFragment())
+//                .commit();
+        addFragment(NoteFragment.newInstance());
 
         initDrawer();
     }
@@ -108,6 +111,15 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .show();
     }
+
+    private void addFragment(Fragment fragment){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment).addToBackStack("");
+        fragmentTransaction
+                .commit();
+    }
+
 
 
 }
