@@ -16,10 +16,10 @@ import android.widget.EditText;
 
 public class NoteDescriptionFragment extends Fragment {
     static final String ARG_INDEX = "index";
-    public static final String CURRENT_NOTE = "Note";
+    public static final String CURRENT_CARD = "Card";
     EditText tv;
     EditText nameTv;
-    Note note;
+    CardData card;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -33,20 +33,22 @@ public class NoteDescriptionFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Bundle arg = getArguments();
         if(arg!=null){
-//            note = (Note) arg.getParcelable(CURRENT_NOTE);
-            note = (Note) arg.getParcelable(CURRENT_NOTE);
+
+            card = (CardData)arg.getParcelable(CURRENT_CARD);
+
             tv = view.findViewById(R.id.note_description);
-            tv.setText(note.getDescription());
+            tv.setText(card.getDescription());
+
             nameTv = view.findViewById(R.id.title);
-            nameTv.setText(note.getName());
-//            nameTv.setText(note.getName());
+            nameTv.setText(card.getTitle());
+
+
             nameTv.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
                 @Override
                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2){
-                    note.setName(nameTv
-                            .getText().toString());
+                    card.setTitle(nameTv.getText().toString());
                 }
                 @Override
                 public void afterTextChanged(Editable editable) { }
@@ -57,8 +59,8 @@ public class NoteDescriptionFragment extends Fragment {
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
                 @Override
                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2){
-                    note.setDescription(tv
-                            .getText().toString());
+
+                    card.setDescription(tv.getText().toString());
                 }
                 @Override
                 public void afterTextChanged(Editable editable) { }
@@ -69,10 +71,10 @@ public class NoteDescriptionFragment extends Fragment {
                 .replace(R.id.checkbox_container, CheckboxFragment.newInstance()).commit();
     }
 
-    public  static NoteDescriptionFragment newInstance(Note note){
+    public static NoteDescriptionFragment newInstance(CardData card){
         NoteDescriptionFragment fragment = new NoteDescriptionFragment();
         Bundle args = new Bundle();
-        args.putParcelable(CURRENT_NOTE, note);
+        args.putParcelable(CURRENT_CARD, card);
         fragment.setArguments(args);
         return  fragment;
     }

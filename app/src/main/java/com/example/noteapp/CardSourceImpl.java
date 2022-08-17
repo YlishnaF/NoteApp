@@ -2,21 +2,33 @@ package com.example.noteapp;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CardSourceImpl implements CardSource {
-    private List<CardData> dataSource;
+    private static List<CardData> dataSource  = new ArrayList<>();;
+    static {
+        for (int i = 0; i < 5; i++) {
+
+            dataSource.add(new CardData("name"+" "+ i, "description" + i));
+        }
+    }
 
     public CardSourceImpl() {
-        dataSource = new ArrayList<>();
+
+    }
+
+    public static  List<CardData> getDataSource() {
+        return dataSource;
     }
 
     public CardSourceImpl init() {
-        List<String> noteTitles = Note.getNotes().stream().map(Note::getName).collect(Collectors.toList());
-        List<String> noteSDescriptions = Note.getNotes().stream().map(Note::getDescription).collect(Collectors.toList());
-        for (int i = 0; i < noteTitles.size(); i++) {
-            dataSource.add(new CardData(noteTitles.get(i), noteSDescriptions.get(i)));
-        }
+//        List<String> noteTitles = Note.getNotes().stream().map(Note::getName).collect(Collectors.toList());
+//        List<String> noteSDescriptions = Note.getNotes().stream().map(Note::getDescription).collect(Collectors.toList());
+//        for (int i = 0; i < noteTitles.size(); i++) {
+////            dataSource.add(new CardData(noteTitles.get(i), noteSDescriptions.get(i)));
+////        }
+//        for (int i = 0; i < 5; i++) {
+//            dataSource.add(new CardData("name"+" "+ i, "description" + i));
+//        }
         return this;
     }
 
@@ -43,7 +55,6 @@ public class CardSourceImpl implements CardSource {
     @Override
     public void addCardData(CardData cardData) {
         dataSource.add(cardData);
-
     }
 
     @Override

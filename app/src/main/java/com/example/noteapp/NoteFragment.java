@@ -65,7 +65,6 @@ public class NoteFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_view);
         data = new CardSourceImpl().init();
         initRecyclerView();
-
     }
 
     private void initRecyclerView(){
@@ -78,22 +77,20 @@ public class NoteFragment extends Fragment {
         animator.setAddDuration(MY_DURATION);
         animator.setRemoveDuration(MY_DURATION);
         recyclerView.setItemAnimator(animator);
-        adapter.setOnItemClickListener(new NoteAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                Note note = Note.getNotes().get(position);
-                showNoteDescription(note);
-            }
+        adapter.setOnItemClickListener((view, position) -> {
+            CardData source = CardSourceImpl.getDataSource().get(position);
+//                Note note = Note.getNotes().get(position);
+            showNoteDescription(source);
         });
     }
 
-    private void showNoteDescription(Note note) {
+    private void showNoteDescription(CardData cardData) {
         FragmentTransaction fragmentTransaction = requireActivity()
                 .getSupportFragmentManager()
                 .beginTransaction();
         fragmentTransaction
                 .addToBackStack("")
-                .replace(R.id.fragment_container, NoteDescriptionFragment.newInstance(note))
+                .replace(R.id.fragment_container, NoteDescriptionFragment.newInstance(cardData))
                 .commit();
     }
 
@@ -109,7 +106,7 @@ public class NoteFragment extends Fragment {
         int position = adapter.getMenuPosition();
         switch (item.getItemId()){
             case R.id.update_note:
-                showNoteDescription(Note.getNotes().get(position));
+                showNoteDescription(CardSourceImpl.getDataSource().get(position));
             return true;
 
             case R.id.delete_note:

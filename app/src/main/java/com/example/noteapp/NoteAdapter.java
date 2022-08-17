@@ -98,8 +98,5 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
             title.setText(cardData.getTitle());
             description.setText(cardData.getDescription());
         }
-
     }
-
-
 }
