@@ -4,9 +4,12 @@ package com.example.noteapp;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+
 public class CardData implements Parcelable {
     private String title;
     private String description;
+
 
     public CardData(String title, String description) {
         this.title = title;

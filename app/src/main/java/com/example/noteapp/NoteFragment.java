@@ -1,5 +1,7 @@
 package com.example.noteapp;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -8,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,26 +20,52 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+
 
 public class NoteFragment extends Fragment {
-    public static final int MY_DURATION =1000;
-
-    private CardSource data;
+    public static final int MY_DURATION = 1000;
+    SharedPreferences sharedPreferences = null;
+    public final static String KEY = "key";
     private NoteAdapter adapter;
     private RecyclerView recyclerView;
+    static ArrayList<CardData> cards = new ArrayList<>();
 
-    public  static NoteFragment newInstance() {
-        return  new NoteFragment();
+
+    public static NoteFragment newInstance() {
+        return new NoteFragment();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_notes_list, container,false);
-        data = new CardSourceImpl().init();
+        View view = inflater.inflate(R.layout.fragment_notes_list, container, false);
+        sharedPreferences = getActivity().getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+        for (int i = 0; i < 3; i++) {
+            cards.add(new CardData("note" + i, "description" + i));
+        }
         initView(view);
+
+        String savedNotes = sharedPreferences.getString(KEY, null);
+        if (savedNotes == null || savedNotes.isEmpty()) {
+            Toast.makeText(getContext(), "Empty", Toast.LENGTH_SHORT).show();
+        } else {
+            try {
+                Type type = new TypeToken<ArrayList<CardData>>() {
+                }.getType();
+                adapter.setNewData(new GsonBuilder().create().fromJson(savedNotes, type));
+                cards = new GsonBuilder().create().fromJson(savedNotes, type);
+            } catch (JsonSyntaxException e) {
+                Toast.makeText(getContext(), "Ошибка трансформации", Toast.LENGTH_SHORT).show();
+            }
+        }
         setHasOptionsMenu(true);
-        return  view;
+        return view;
     }
 
     @Override
@@ -46,41 +75,42 @@ public class NoteFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_add:
-                data.addCardData(new CardData("name " +(data.size()),
-                        "description"+(data.size())));
-                adapter.notifyItemInserted(data.size()-1);
-                recyclerView.smoothScrollToPosition(data.size()-1);
+                cards.add(new CardData("Note title", "Note description"));
+                adapter.setNewData(cards);
+                String jsonNote = new GsonBuilder().create().toJson(cards);
+                sharedPreferences.edit().putString(KEY, jsonNote).apply();
+                adapter.notifyItemInserted(cards.size() - 1);
+                recyclerView.smoothScrollToPosition(cards.size() - 1);
                 return true;
             case R.id.action_clear:
-                data.clearCardData();
-                adapter.notifyDataSetChanged();
+                cards.removeAll(cards);
+                jsonNote = new GsonBuilder().create().toJson(cards);
+                sharedPreferences.edit().putString(KEY, jsonNote).apply();
+                adapter.setNewData(cards);
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void initView(View view){
+    private void initView(View view) {
         recyclerView = view.findViewById(R.id.recycler_view);
-        data = new CardSourceImpl().init();
         initRecyclerView();
     }
 
-    private void initRecyclerView(){
+    private void initRecyclerView() {
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new NoteAdapter(data, this);
+        adapter = new NoteAdapter(cards, this);
         recyclerView.setAdapter(adapter);
         DefaultItemAnimator animator = new DefaultItemAnimator();
         animator.setAddDuration(MY_DURATION);
         animator.setRemoveDuration(MY_DURATION);
         recyclerView.setItemAnimator(animator);
         adapter.setOnItemClickListener((view, position) -> {
-            CardData source = CardSourceImpl.getDataSource().get(position);
-//                Note note = Note.getNotes().get(position);
-            showNoteDescription(source);
+            showNoteDescription(cards.get(position));
         });
     }
 
@@ -104,14 +134,16 @@ public class NoteFragment extends Fragment {
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         int position = adapter.getMenuPosition();
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.update_note:
-                showNoteDescription(CardSourceImpl.getDataSource().get(position));
-            return true;
+                showNoteDescription(cards.get(position));
+                return true;
 
             case R.id.delete_note:
-                data.deleteCardData(position);
-                adapter.notifyItemRemoved(position);
+                cards.remove(position);
+                adapter.setNewData(cards);
+                String jsonNote = new GsonBuilder().create().toJson(cards);
+                sharedPreferences.edit().putString(KEY, jsonNote).apply();
                 return true;
         }
         return super.onContextItemSelected(item);
