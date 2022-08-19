@@ -7,19 +7,32 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
     private final static String TAG = "NoteAdapter";
-//    List<String> noteTitles;
-    private CardSource dataSource;
+    private ArrayList<CardData> dataSet;
+    //    private CardSource dataSource;
+    private final Fragment fragment;
     private OnItemClickListener itemClickListener;
+    private int menuPosition;
 
-    public NoteAdapter(CardSource dataSource) {
-        this.dataSource=dataSource;
+    public int getMenuPosition() {
+        return menuPosition;
+    }
+
+    public NoteAdapter(ArrayList<CardData> dataSet, Fragment fragment) {
+        this.dataSet = dataSet;
+        this.fragment = fragment;
+    }
+
+    public void setNewData(ArrayList<CardData> dataSet) {
+        this.dataSet = dataSet;
+        System.out.println("setNewData " + dataSet.size());
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -32,49 +45,80 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull NoteAdapter.ViewHolder holder, int position) {
-//        holder.getTextView().setText(noteTitles.get(position));
-        holder.setData(dataSource.getCardData(position));
+        holder.getTitle().setText(dataSet.get(position).getTitle());
+        holder.getDescription().setText(dataSet.get(position).getDescription());
         Log.d(TAG, "onBindViewHolder");
 
     }
 
     @Override
     public int getItemCount() {
-        return dataSource.size();
+        System.out.println("Метод размер массива" + dataSet.size());
+        return dataSet.size();
     }
 
-    public void setOnItemClickListener(OnItemClickListener itemClickListener){
+
+    public void setOnItemClickListener(OnItemClickListener itemClickListener) {
         this.itemClickListener = itemClickListener;
     }
-    public interface OnItemClickListener{
+
+    public interface OnItemClickListener {
         void onItemClick(View view, int position);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView title;
         private TextView description;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.title);
+
             description = itemView.findViewById(R.id.description);
-            title.setOnClickListener(new View.OnClickListener() {
+
+
+            registerContextMenu(itemView);
+            title.setOnClickListener(view -> {
+                if (itemClickListener != null) {
+                    itemClickListener.onItemClick(view, getAdapterPosition());
+                }
+            });
+
+            title.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
-                public void onClick(View view) {
-                    if(itemClickListener!=null){
-                        itemClickListener.onItemClick(view, getAdapterPosition());
-                    }
+                public boolean onLongClick(View view) {
+                    menuPosition = getLayoutPosition();
+                    itemView.showContextMenu(10, 10);
+                    return true;
                 }
             });
         }
 
+        //
+        private void registerContextMenu(View itemView) {
+            if (fragment != null) {
+                itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        menuPosition = getLayoutPosition();
+                        return false;
+                    }
+                });
+                fragment.registerForContextMenu(itemView);
+            }
+        }
 
-        public void setData(CardData cardData){
+
+        public void setData(CardData cardData) {
             title.setText(cardData.getTitle());
             description.setText(cardData.getDescription());
         }
+        public TextView getTitle() {
+            return title;
+        }
 
+        public TextView getDescription() {
+            return description;
+        }
     }
-
-
 }

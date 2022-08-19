@@ -15,5 +15,7 @@
     <string name="warning_delete">Удалить запись?</string>
     <string name="yes">yes</string>
     <string name="no">No</string>
+    <string name="clear">очистить</string>
+    <string name="update_note">Изменить запись</string>
 
 </resources>
